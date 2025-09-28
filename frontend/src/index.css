@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Light mode defaults */
+body {
+  @apply bg-slate-100 text-slate-900 overflow-x-hidden;
+  background-image:
+    /* pale sky (tailwind sky-200) */
+    radial-gradient(1000px 520px at -10% -20%, rgba(186,230,253,0.18), transparent 60%),
+    /* pale violet (tailwind violet-200) */
+    radial-gradient(840px 460px at 110% 120%, rgba(221,214,254,0.16), transparent 60%),
+    /* very soft neutral vignette */
+    radial-gradient(35% 55% at 50% 0%, rgba(15,23,42,0.03), transparent 60%);
+}
+
+/* Dark mode overrides */
+.dark body {
+  @apply bg-black text-white;
+  background-image:
+    radial-gradient(1200px 600px at -10% -20%, rgba(0,229,255,0.10), transparent 60%),
+    radial-gradient(900px 500px at 110% 120%, rgba(154,92,255,0.10), transparent 60%),
+    radial-gradient(40% 60% at 50% 0%, rgba(255,255,255,0.03), transparent 60%);
+}
+
+/* Neon gradient text */
+.neon-gradient {
+  background: linear-gradient(90deg, #00e5ff 0%, #9a5cff 50%, #00e5ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+
+.neon-title {
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.03),
+    0 0 6px rgba(0,229,255,0.18),
+    0 0 14px rgba(154,92,255,0.12);
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Glass panel (light default); dark override below */
+.glass {
+  background: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 4px 18px rgba(2, 6, 23, 0.06), inset 0 0 0 1px rgba(2, 6, 23, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(2, 6, 23, 0.12);
+}
+.dark .glass {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Glow borders */
+.glow-border {
+  position: relative;
+}
+.glow-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg, rgba(0,229,255,0.45), rgba(154,92,255,0.45));
+  filter: blur(10px);
+  z-index: -1;
+  border-radius: inherit;
+}
+
+/* Animated gradient border utility */
+.animated-border {
+  position: relative;
+}
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(0,229,255,0.40), rgba(154,92,255,0.40));
+  filter: blur(10px);
+  opacity: 0.40;
+  animation: pulseGlow 3s ease-in-out infinite;
+  z-index: -1;
+}
+.dark .animated-border::before {
+  background: linear-gradient(90deg, rgba(0,229,255,0.55), rgba(154,92,255,0.55));
+  filter: blur(12px);
+  opacity: 0.55;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.45; filter: blur(10px); }
+  50% { opacity: 0.8; filter: blur(14px); }
+}
