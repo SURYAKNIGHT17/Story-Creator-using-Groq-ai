@@ -6,7 +6,8 @@ const API_URL = ENV_URL || FALLBACKS[0]
 
 export const api = axios.create({
   baseURL: API_URL,
-  timeout: 30_000,
+  // Netlify → cold backend (Render/Railway) may take >30s on first spin-up
+  timeout: 60_000,
 })
 
 api.interceptors.response.use(
@@ -38,18 +39,28 @@ export type GeneratePayload = {
 }
 
 export async function generateBlog(payload: GeneratePayload): Promise<{ content: string; model: string }> {
-  // If baseURL is unreachable, try fallbacks once
+  // Preflight: try to warm up backend in case of cold start
+  let healthy = await getHealth()
+  if (!healthy) {
+    for (let i = 0; i < 3 && !healthy; i++) {
+      await new Promise((r) => setTimeout(r, 3000))
+      healthy = await getHealth()
+    }
+  }
+
   try {
     const { data } = await api.post('/generate-blog', payload)
     return data
-  } catch (e) {
+  } catch (e: any) {
+    // If timeout/cold start, try fallbacks once
+    const isTimeout = (e?.code === 'ECONNABORTED') || /timeout/i.test(String(e?.message))
     for (const fb of FALLBACKS) {
       if (fb === api.defaults.baseURL) continue
       try {
-        const { data } = await axios.post(fb + '/generate-blog', payload, { timeout: 30_000 })
+        const { data } = await axios.post(fb + '/generate-blog', payload, { timeout: 60_000 })
         return data
       } catch {}
     }
-    throw e
+    throw new Error(isTimeout ? 'Request timed out. Backend may be waking up—please try again.' : e?.message || 'Request failed')
   }
 }
